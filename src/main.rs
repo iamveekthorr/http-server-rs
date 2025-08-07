@@ -3,15 +3,17 @@ use std::{
     io::{BufReader, prelude::*},
     net::{TcpListener, TcpStream},
 };
+use web_server_chappter_20::ThreadPool;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let pool = ThreadPool::new(4);
 
     for stream in listener.incoming() {
         match stream {
-            Ok(stream) => {
+            Ok(stream) => pool.execute(|| {
                 handle_connection(stream);
-            }
+            }),
             Err(err) => panic!("error: {}", err),
         };
     }
